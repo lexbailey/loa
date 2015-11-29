@@ -12,6 +12,8 @@ int min(int a, int b){
 #define BOARD_WIDTH (4)
 #define BOARD_HEIGHT (4)
 
+#define INDEX_OF(x,y) ((y*BOARD_WIDTH)+x)
+
 #define MAX_PAWN_EACH (4)
 
 #define EMPTY_SQUARE (0)
@@ -38,18 +40,18 @@ int totalInLine(int board[], int x, int y, int line_dir){
 	int mx, my;
 	switch (line_dir){
 		case LINE_DIR_UP_DOWN:
-			for (my=0; my<=BOARD_HEIGHT-1; my++){index = (x*BOARD_WIDTH)+my; total += board[index]!=EMPTY_SQUARE?1:0;}
+			for (my=0; my<=BOARD_HEIGHT-1; my++){index = INDEX_OF(x,my); total += board[index]!=EMPTY_SQUARE?1:0;}
 			break;
 		case LINE_DIR_LEFT_RIGHT:
-			for (mx=0; mx<=BOARD_WIDTH-1; mx++){index = (mx*BOARD_WIDTH)+y; total += board[index]!=EMPTY_SQUARE?1:0;}
+			for (mx=0; mx<=BOARD_WIDTH-1; mx++){index = INDEX_OF(mx,y); total += board[index]!=EMPTY_SQUARE?1:0;}
 			break;
 		case LINE_DIR_UPLEFT_DOWNRIGHT:
-			for (mx=x, my=y; mx>=0&&my<=BOARD_HEIGHT-1; mx--,my++){index = (mx*BOARD_WIDTH)+my; total += board[index]!=EMPTY_SQUARE?1:0;}
-			for (mx=x+1, my=y-1; mx<=BOARD_WIDTH-1&&my>=0; mx++,my--){index = (mx*BOARD_WIDTH)+my; total += board[index]!=EMPTY_SQUARE?1:0;}
+			for (mx=x, my=y; mx>=0&&my<=BOARD_HEIGHT-1; mx--,my++){index = INDEX_OF(mx,my); total += board[index]!=EMPTY_SQUARE?1:0;}
+			for (mx=x+1, my=y-1; mx<=BOARD_WIDTH-1&&my>=0; mx++,my--){index = INDEX_OF(mx,my); total += board[index]!=EMPTY_SQUARE?1:0;}
 			break;
 		case LINE_DIR_UPRIGHT_DOWNLEFT:
-			for (mx=x, my=y; mx<=BOARD_WIDTH-1&&my<=BOARD_HEIGHT-1; mx++,my++){index = (mx*BOARD_WIDTH)+my; total += board[index]!=EMPTY_SQUARE?1:0;}
-			for (mx=x-1, my=y-1; mx>=0&&my>=0; mx--,my--){index = (mx*BOARD_WIDTH)+my; total += board[index]!=EMPTY_SQUARE?1:0;}
+			for (mx=x, my=y; mx<=BOARD_WIDTH-1&&my<=BOARD_HEIGHT-1; mx++,my++){index = INDEX_OF(mx,my); total += board[index]!=EMPTY_SQUARE?1:0;}
+			for (mx=x-1, my=y-1; mx>=0&&my>=0; mx--,my--){index = INDEX_OF(mx,my); total += board[index]!=EMPTY_SQUARE?1:0;}
 			break;
 	}
 	printf("from position %d, %d, line dir %d has a total of %d pieces.\n", x,y,line_dir, total);
@@ -101,7 +103,7 @@ int canMoveBy(int amount, int board[], int x, int y, int line_dir){
 	int index;
 	int mx, my;
 	int canMove = 0;
-	int player = board[(x*BOARD_WIDTH)+y];
+	int player = board[INDEX_OF(x,y)];
 	int otherPlayer = player == BLACK_PAWN?WHITE_PAWN:BLACK_PAWN;
 	int destValid = 0;
 	int dx, dy;
@@ -109,20 +111,20 @@ int canMoveBy(int amount, int board[], int x, int y, int line_dir){
 		case LINE_DIR_UP_DOWN:
 			//Up
 			getDest(x,y,amount, MOVE_DIR_UP, &dx, &dy);
-			if (isValidSquare(dx,dy) && board[(dx*BOARD_WIDTH)+dy] != player){
+			if (isValidSquare(dx,dy) && board[INDEX_OF(dx,dy)] != player){
 				canMove = 1;
-				for (my=y+1; my<=min(BOARD_HEIGHT-1, y+amount-1); my++){
-					index = (x*BOARD_WIDTH)+my;
+				for (my=y+1; my<=y+amount-1; my++){
+					index = INDEX_OF(x,my);
 					if (board[index] == otherPlayer){canMove = 0; break;}
 				}
 				if (canMove){printf("Up\n");return 1;}
 			}
 			//Down
 			getDest(x,y,amount, MOVE_DIR_DOWN, &dx, &dy);
-			if (isValidSquare(dx,dy) && board[(dx*BOARD_WIDTH)+dy] != player){
+			if (isValidSquare(dx,dy) && board[INDEX_OF(dx,dy)] != player){
 				canMove = 1;
-				for (my=y-1; my>=max(0, y-amount+1); my--){
-					index = (x*BOARD_WIDTH)+my;
+				for (my=y-1; my>=y-amount+1; my--){
+					index = INDEX_OF(x,my);
 					if (board[index] == otherPlayer){canMove = 0; break;}
 				}
 				if (canMove){printf("Down\n");return 1;}
@@ -131,20 +133,20 @@ int canMoveBy(int amount, int board[], int x, int y, int line_dir){
 		case LINE_DIR_LEFT_RIGHT:
 			//Left
 			getDest(x,y,amount, MOVE_DIR_LEFT, &dx, &dy);
-			if (isValidSquare(dx,dy) && board[(dx*BOARD_WIDTH)+dy] != player){
+			if (isValidSquare(dx,dy) && board[INDEX_OF(dx,dy)] != player){
 				canMove = 1;
-				for (mx=x+1; mx<=min(BOARD_WIDTH-1, x+amount-1); mx++){
-					index = (mx*BOARD_WIDTH)+y;
+				for (mx=x+1; mx<=x+amount-1; mx++){
+					index = INDEX_OF(mx,y);
 					if (board[index] == otherPlayer){canMove = 0; break;}
 				}
 				if (canMove){printf("Left\n");return 1;}
 			}
 			//Right
 			getDest(x,y,amount, MOVE_DIR_RIGHT, &dx, &dy);
-			if (isValidSquare(dx,dy) && board[(dx*BOARD_WIDTH)+dy] != player){
+			if (isValidSquare(dx,dy) && board[INDEX_OF(dx,dy)] != player){
 				canMove = 1;
-				for (mx=x-1; mx>=max(0, x-amount+1); mx--){
-					index = (mx*BOARD_WIDTH)+y;
+				for (mx=x-1; mx>=x-amount+1; mx--){
+					index = INDEX_OF(mx,y);
 					if (board[index] == otherPlayer){canMove = 0; break;}
 				}
 				if (canMove){printf("Right\n");return 1;}
@@ -153,20 +155,20 @@ int canMoveBy(int amount, int board[], int x, int y, int line_dir){
 		case LINE_DIR_UPLEFT_DOWNRIGHT:
 			//Up-Left
 			getDest(x,y,amount, MOVE_DIR_UPLEFT, &dx, &dy);
-			if (isValidSquare(dx,dy) && board[(dx*BOARD_WIDTH)+dy] != player){
+			if (isValidSquare(dx,dy) && board[INDEX_OF(dx,dy)] != player){
 				canMove = 1;
-				for (mx=x-1,my=y+1; mx>=max(0, x-amount+1),my<=min(BOARD_HEIGHT-1, y+amount-1); my++,mx--){
-					index = (mx*BOARD_WIDTH)+my;
+				for (mx=x-1,my=y+1; mx>=x-amount+1,my<=y+amount-1; my++,mx--){
+					index = INDEX_OF(mx,my);
 					if (board[index] == otherPlayer){canMove = 0; break;}
 				}
 				if (canMove){printf("Up-Left\n");return 1;}
 			}
 			//Down-Right
 			getDest(x,y,amount, MOVE_DIR_DOWNRIGHT, &dx, &dy);
-			if (isValidSquare(dx,dy) && board[(dx*BOARD_WIDTH)+dy] != player){
+			if (isValidSquare(dx,dy) && board[INDEX_OF(dx,dy)] != player){
 				canMove = 1;
-				for (mx=x+1,my=y-1; mx<=min(BOARD_WIDTH-1, x+amount-1),my>=max(0, y-amount+1); my--,mx++){
-					index = (mx*BOARD_WIDTH)+my;
+				for (mx=x+1,my=y-1; mx<=x+amount-1,my>=y-amount+1; my--,mx++){
+					index = INDEX_OF(mx,my);
 					if (board[index] == otherPlayer){canMove = 0; break;}
 				}
 				if (canMove){printf("Down-Right\n");return 1;}
@@ -174,15 +176,11 @@ int canMoveBy(int amount, int board[], int x, int y, int line_dir){
 			break;
 		case LINE_DIR_UPRIGHT_DOWNLEFT:
 			//Up-Right
-			printf("Checking up-right.\n");
 			getDest(x,y,amount, MOVE_DIR_UPRIGHT, &dx, &dy);
-			printf("\tDest is %d, %d\n", dx, dy);
-			if (isValidSquare(dx,dy) && board[(dx*BOARD_WIDTH)+dy] != player){
-				printf("\tDest is valid\n");
+			if (isValidSquare(dx,dy) && board[INDEX_OF(dx,dy)] != player){
 				canMove = 1;
-				for (mx=x+1,my=y+1; mx<=min(BOARD_WIDTH-1, x+amount-1),my<=min(BOARD_HEIGHT-1, y+amount-1); my++,mx++){
-					printf("\tChecking can move through %d, %d\n", mx, my);
-					index = (mx*BOARD_WIDTH)+my;
+				for (mx=x+1,my=y+1; mx<=x+amount-1,my<=y+amount-1; my++,mx++){
+					index = INDEX_OF(mx,my);
 					if (board[index] == otherPlayer){printf("\t\tcan't\n");canMove = 0; break;}
 				}
 				if (canMove){printf("Up-Right\n");return 1;}
@@ -192,10 +190,10 @@ int canMoveBy(int amount, int board[], int x, int y, int line_dir){
 			}
 			//Down-Left
 			getDest(x,y,amount, MOVE_DIR_DOWNLEFT, &dx, &dy);
-			if (isValidSquare(dx,dy) && board[(dx*BOARD_WIDTH)+dy] != player){
+			if (isValidSquare(dx,dy) && board[INDEX_OF(dx,dy)] != player){
 				canMove = 1;
-				for (mx=x-1,my=y-1; mx>=max(0, x-amount+1),my>=max(0, y-amount+1); my--,mx--){
-					index = (mx*BOARD_WIDTH)+my;
+				for (mx=x-1,my=y-1; mx>=x-amount+1,my>=y-amount+1; my--,mx--){
+					index = INDEX_OF(mx,my);
 					if (board[index] == otherPlayer){canMove = 0; break;}
 				}
 				if (canMove){printf("Down-Left\n");return 1;}
@@ -222,7 +220,7 @@ int isValidBoard(int board[]){
 
 	for (int x = 0; x<= BOARD_WIDTH-1; x++){
 		for (int y = 0; y<= BOARD_HEIGHT-1; y++){
-			int i = (x*BOARD_WIDTH)+y;
+			int i = INDEX_OF(x,y);
 			int thisSquare = board[i];
 			if (thisSquare == EMPTY_SQUARE){
 				continue;
@@ -253,7 +251,7 @@ int bothCanMove(int board[]){
 
 	for (int x = 0; x<= BOARD_WIDTH-1; x++){
 		for (int y = 0; y<= BOARD_HEIGHT-1; y++){
-			int i = (x*BOARD_WIDTH)+y;
+			int i = INDEX_OF(x,y);
 			int thisSquare = board[i];
 			if (thisSquare == EMPTY_SQUARE){
 				continue;
@@ -274,9 +272,27 @@ int bothCanMove(int board[]){
 	return 0;
 }
 
+int neitherCanMove(int board[]){
+	for (int x = 0; x<= BOARD_WIDTH-1; x++){
+		for (int y = 0; y<= BOARD_HEIGHT-1; y++){
+			int i = INDEX_OF(x,y);
+			int thisSquare = board[i];
+			if (thisSquare == EMPTY_SQUARE){
+				continue;
+			}
+			if (playerCanMove(board, x, y, thisSquare)){
+				return 0;
+			}
+		}
+	}
+
+	return 1;
+}
+
 void testArbitraryBoard(int board[BOARD_HEIGHT*BOARD_WIDTH]){
 	#ifdef ASSERT_CBMC
-	assert(bothCanMove(board)||!isValidBoard(board));
+	//assert(!isValidBoard(board)||bothCanMove(board));
+	assert(!isValidBoard(board)||!neitherCanMove(board));
 	#endif
 }
 
@@ -288,7 +304,7 @@ void testRandomBoard(){
 	int i;
 	for (int x = 0; x<= BOARD_WIDTH-1; x++){
 		for (int y = 0; y<= BOARD_HEIGHT-1; y++){
-			i = (x*BOARD_WIDTH)+y;
+			i = INDEX_OF(x,y);
 			board[i] =  nondet_int();
 		}
 	}
@@ -297,23 +313,24 @@ void testRandomBoard(){
 }
 
 int main(){
-/*
+
 	int board[] = {
 			 1,0,1,0,0,0,0,0,
 			 0,0,0,0,0,0,0,0,
-			 1,0,0,0,0,0,0,0,
+			 1,0,2,2,0,0,0,0,
 			 0,0,0,0,0,0,0,0,
 			 0,0,0,0,0,0,0,0,
 			 0,0,0,0,0,0,0,0,
 			 0,0,0,0,0,0,0,0,
 			 0,0,0,0,0,0,0,0
 			};
-*/
+/*
 	int board[] = {
-			 0,0,1,2,
-			 0,0,1,0,
-			 0,2,0,2,
-			 0,1,1,0
+			 0,0,2,2,
+			 0,1,0,2,
+			 1,1,0,0,
+			 0,0,0,0
 			};
-	bothCanMove(board);
+*/
+	printf("bothCanMove() = %d, isValidBoard() = %d\n", bothCanMove(board), isValidBoard(board));
 }
